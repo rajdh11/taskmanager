@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard · Team Task Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a class="brand" href="/dashboard">
+                <span class="logo">T</span>
+                <span>Team Task Manager</span>
+            </a>
+            <div class="user">
+                <span>Hi, <strong><%= user.name %></strong></span>
+                <span class="role-pill"><%= user.role %></span>
+                <a href="/auth/logout" class="btn btn-ghost">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container page">
+        <div class="page-header">
+            <h1>Tasks</h1>
+            <span class="meta"><%= tasks.length %> total</span>
+        </div>
+
+        <% if (user.role === 'Admin') { %>
+        <section class="card">
+            <h2>Assign a new task</h2>
+            <form action="/tasks" method="POST" class="form-row">
+                <input type="text" name="title" class="input" placeholder="Task title" required />
+                <select name="assignedTo" class="select">
+                    <option value="">Assign member…</option>
+                    <% members.forEach(member => { %>
+                        <option value="<%= member._id %>"><%= member.name %></option>
+                    <% }) %>
+                </select>
+                <input type="date" name="dueDate" class="input" />
+                <button type="submit" class="btn btn-success">Create task</button>
+            </form>
+        </section>
+        <% } %>
+
+        <section class="card">
+            <h2>All team tasks</h2>
+            <% if (tasks.length === 0) { %>
+                <div class="empty">No tasks yet. <% if (user.role === 'Admin') { %>Create one above to get started.<% } %></div>
+            <% } else { %>
+            <div class="table-wrap">
+                <table class="tasks">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Assigned to</th>
+                            <th>Due</th>
+                            <th>Status</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% tasks.forEach(task => { %>
+                        <tr>
+                            <td class="task-title"><%= task.title %></td>
+                            <td><%= task.assignedTo ? task.assignedTo.name : '—' %></td>
+                            <td class="muted"><%= task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—' %></td>
+                            <td>
+                                <% const cls = task.status === 'Completed' ? 'badge-completed' : (task.status === 'In-Progress' ? 'badge-progress' : 'badge-pending'); %>
+                                <span class="badge <%= cls %>"><%= task.status %></span>
+                            </td>
+                            <td>
+                                <form action="/tasks/<%= task._id %>/update" method="POST" class="status-form">
+                                    <select name="status" class="select task-status-select" aria-label="Update status">
+                                        <option value="Pending" <%= task.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                        <option value="In-Progress" <%= task.status === 'In-Progress' ? 'selected' : '' %>>In-Progress</option>
+                                        <option value="Completed" <%= task.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+                                    </select>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+        </section>
+    </main>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create account · Team Task Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <main class="auth-shell">
+        <div class="auth-card">
+            <div class="brand">
+                <span class="logo">T</span>
+                <span>Team Task Manager</span>
+            </div>
+            <h1>Create your account</h1>
+            <p class="subtitle">Start organising your team's work in minutes.</p>
+
+            <form action="/auth/register" method="POST" novalidate>
+                <div class="field">
+                    <label for="name">Full name</label>
+                    <input id="name" class="input" type="text" name="name" placeholder="Jane Doe" required />
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" class="input" type="email" name="email" placeholder="name@example.com" required />
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" class="input" type="password" name="password" placeholder="At least 8 characters" required minlength="8" />
+                </div>
+                <div class="field">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" class="select">
+                        <option value="Member">Member — view & update tasks</option>
+                        <option value="Admin">Admin — manage projects & assign tasks</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Create account</button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account? <a href="/">Sign in</a>
+            </p>
+        </div>
+    </main>
+</body>
+</html>

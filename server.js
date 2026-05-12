@@ -1,0 +1,61 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const dotenv = require('dotenv');
+const path = require('path');
+const { protect } = require('./middleware/auth');
+const User = require('./models/User');
+const Task = require('./models/Task');
+
+dotenv.config();
+const app = express();
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+if (!process.env.MONGO_URI) {
+    console.error('Missing MONGO_URI in .env');
+    process.exit(1);
+}
+if (!process.env.JWT_SECRET) {
+    console.error('Missing JWT_SECRET in .env');
+    process.exit(1);
+}
+
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log('DB Connected'))
+    .catch((err) => {
+        console.error('DB connection error:', err.message);
+        process.exit(1);
+    });
+
+// --- ROUTES ---
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/projects', require('./routes/projectRoutes'));
+app.use('/tasks', require('./routes/taskRoutes'));
+
+// Public pages
+app.get('/', (req, res) => res.render('login'));
+app.get('/signup', (req, res) => res.render('signup'));
+
+// Dashboard
+app.get('/dashboard', protect, async (req, res) => {
+    try {
+        const [tasks, members] = await Promise.all([
+            Task.find().populate('assignedTo'),
+            User.find({ role: 'Member' })
+        ]);
+        res.render('dashboard', { user: req.user, tasks, members });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Failed to load dashboard');
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
