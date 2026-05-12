@@ -49,11 +49,12 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/projects', require('./routes/projectRoutes'));
 app.use('/tasks', require('./routes/taskRoutes'));
 
-// Public Routes
+// Home Route
 app.get('/', (req, res) => {
-    res.render('login');
+    res.send('Backend Working Successfully');
 });
 
+// Signup Route
 app.get('/signup', (req, res) => {
     res.render('signup');
 });
